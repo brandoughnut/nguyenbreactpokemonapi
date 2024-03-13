@@ -123,6 +123,20 @@
     box-shadow: 0 10px 20px rgba(145, 92, 182, .4);
 }
 
+@media screen and (max-width:1260px){
+    .canvasBG {
+        margin-left: 13%;
+        margin-right: 13%;
+    }
+}
+
+@media screen and (max-width:700px){
+    .canvasBG {
+        margin-left: 0%;
+        margin-right: 0%;
+    }
+}
+
 .App {
   text-align: center;
 }

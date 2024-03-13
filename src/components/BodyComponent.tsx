@@ -42,12 +42,14 @@ const BodyComponent = () => {
     const [pokemonLocation, setPokemonLocation] = useState<string>('');
     const [pokemonMoves, setPokemonMoves] = useState<IPokemonMove[]>([]);
     const [pokemonAbilities, setPokemonAbilities] = useState<IPokemonAbilities[]>([]);
+    const [pokemonInput, setPokemonInput] = useState<string>('1');
+
+    const [reRender, setReRender] = useState<boolean>(true);
 
     useEffect(() => {
         const getPokemonData = async () => {
-            const pokemonData = await getPokemon('dialga');
+            const pokemonData = await getPokemon(pokemonInput);
             console.log(pokemonData);
-            console.log(pokemonData.abilities);
             setPokemonType(pokemonData.types);
             setPokemonName(pokemonData.name[0].toUpperCase()+pokemonData.name.substring(1));
             setPokemonID(pokemonData.id);
@@ -57,8 +59,8 @@ const BodyComponent = () => {
         }
 
         const getPokemonLocation = async () => {
-            const pokemonLocation = await LocationAPISearch('dialga');
-            if(pokemonLocation.length == 0){
+            const pokemonLocation = await LocationAPISearch(pokemonInput);
+            if(pokemonLocation.length === 0){
                 setPokemonLocation('N/A');
             }else{
                 setPokemonLocation(pokemonLocation[0].location_area.name.split("-").join(" "));
@@ -66,7 +68,18 @@ const BodyComponent = () => {
         }
         getPokemonData();
         getPokemonLocation();
-    }, [])
+        setPokemonInput('');
+
+    }, [reRender])
+
+    const randomPokemon = () => {
+        let random = Math.floor(Math.random() * 649) + 1;
+        setPokemonInput(`${random}`);
+    }
+
+    const reRenderPage = () => {
+        setReRender(!reRender);
+    }
 
   return (
     <div>
@@ -75,18 +88,23 @@ const BodyComponent = () => {
 
       <div className="flex items-center">
         <div className="hidden sm:block">
-            <button className="bg-[#F78484] w-[70px] h-[61px] flex items-center justify-center rounded-2xl">
+            <button onClick={() => {
+                randomPokemon();
+                reRenderPage();
+            }} className="bg-[#F78484] w-[70px] h-[61px] flex items-center justify-center rounded-2xl">
                 <img src={random} alt="shuffle icon" />
             </button> 
         </div>
         
 
         <div className="mx-5">
-            <input className="h-[50px] w-[275px] sm:h-[61px] sm:w-[379px] rounded-xl focus:outline-none focus:ring-0 text-xl sm:text-2xl placeholder:text-black juraRegular" type="text" placeholder="Search for a Pokemon"/>
+            <input onChange={(e) => setPokemonInput(e.target.value)} value={pokemonInput} className="h-[50px] w-[275px] sm:h-[61px] sm:w-[379px] rounded-xl focus:outline-none focus:ring-0 text-xl sm:text-2xl placeholder:text-black juraRegular" type="text" placeholder="Search for a Pokemon"/>
         </div>
         
 
-        <button className="bg-[#F78484] w-[57px] h-[50px] sm:w-[70px] sm:h-[61px] flex items-center justify-center rounded-xl sm:rounded-2xl">
+        <button onClick={() => {
+            reRenderPage();
+        }} className="bg-[#F78484] w-[57px] h-[50px] sm:w-[70px] sm:h-[61px] flex items-center justify-center rounded-xl sm:rounded-2xl">
           <img src={search} alt="search icon" />
         </button>
       </div>
@@ -100,12 +118,11 @@ const BodyComponent = () => {
       </div>
       </div>
 
-        <div className="fire min-h-screen bg-cover pt-[73px]">
+        <div className="grass min-h-screen bg-cover pt-[73px]">
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 canvasBG">
-        {/* bg-white/75 h-auto xl:h-[617px] rounded-3xl */}
         <div className="bg-white/75 h-auto xl:h-[617px] rounded-3xl">
             <div className="flex justify-center mt-10 leftMargin">
-                <div className="bg-white/75 rounded-[235px] px-5 py-5">
+                <div className="bg-white/75 rounded-[235px] px-5 py-5 joe">
                     <img className="h-[235px] cursorEffect" src={pokemonImage} alt="charmander"/>
                 </div>
                 <div>
@@ -120,7 +137,7 @@ const BodyComponent = () => {
                 <p>Type: {pokemonType.map((pokemonType, idx) => {
                     return (
                         <>
-                           {<span key={idx}>{`${pokemonType.type.name}, `}</span>}
+                           {<span key={idx}>{`${pokemonType.type.name[0].toUpperCase()+pokemonType.type.name.substring(1)}, `}</span>}
                         </>
                     )
                 })}</p>
