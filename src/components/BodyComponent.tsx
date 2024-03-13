@@ -1,22 +1,40 @@
 import React, { useEffect, useState } from 'react'
 import { getPokemon } from '../DataServices/DataServices'
+import favoriteIcon from '../assets/pokemonfavorite.png';
 import '../App.css';
 
 const BodyComponent = () => {
 
+    interface IType {
+        name:string
+        url:string
+    }
+    interface IPokemonType {
+        slot:number
+        type:IType
+    }
+
     const [pokemonName, setPokemonName] = useState<string>('');
-    const [pokemonType, setPokemonType] = useState<string>('');
+    const [pokemonID, setPokemonID] = useState<string>('');
+    const [pokemonType, setPokemonType] = useState<IPokemonType[]>([]);
+    const [pokemonImage, setPokemonImage] = useState<string>('');
 
     useEffect(() => {
         const getData = async () => {
-            const pokemonData = await getPokemon('pikachu');
+            const pokemonData = await getPokemon('aggron');
             console.log(pokemonData);
+            console.log(pokemonData.types);
+            setPokemonType(pokemonData.types);
             setPokemonName(pokemonData.name);
+            setPokemonID(pokemonData.id);
+            setPokemonImage(pokemonData.sprites.other["official-artwork"].front_default);
         }
         getData();
     }, [])
 
   return (
+    <div>
+
         <div
        className="fire min-h-screen bg-cover pt-[73px]"
     >
@@ -25,18 +43,25 @@ const BodyComponent = () => {
         <div className="bg-white/75 h-auto xl:h-[617px] rounded-3xl">
             <div className="flex justify-center mt-10 leftMargin">
                 <div className="bg-white/75 rounded-[235px] px-5 py-5 joe">
-                    <img className="h-[235px] cursorEffect" src="./assets/pokemon1.png" alt="charmander"/>
+                    <img className="h-[235px] cursorEffect" src={pokemonImage} alt="charmander"/>
                 </div>
                 <div>
-                    <img className='cursorEffect' src="./assets/pokemonfavorite.png" alt="favorite icon"/>
+                    <img className='cursorEffect' src={favoriteIcon} alt="favorite icon"/>
                 </div>
                 
                 
             </div>
 
             <div className="text-center text-[30px] mt-14 mx-7 juraBold">
-                <p>Name: Charmander #4</p>
-                <p>Type: Fire</p>
+                <p>Name: {`${pokemonName} #${pokemonID}`}</p>
+                <p>Type: {pokemonType.map((pokemonType) => {
+                    return (
+                        <>
+                           {`${pokemonType.type.name}, `}
+                        </>
+                    )
+                })}</p>
+                
                 <p>Location Found: N/A</p>
                 <div className="text-center">
                     <button className="text-black bg-white opacity-75 h-[83px] w-[300px] sm:w-[398px] text-[30px] rounded-3xl px-5 py-2.5 mt-[37px] mb-[35px] xl:hidden juraBold" type="button" data-drawer-target="drawer-example" data-drawer-show="drawer-example" aria-controls="drawer-example">
@@ -83,6 +108,8 @@ const BodyComponent = () => {
         </div>
     </div>
         
+
+    </div>
 
     </div>
   )
