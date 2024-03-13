@@ -8,4 +8,14 @@ const getPokemon = async (pokemon:string) => {
 
 }
 
-export {getPokemon}
+const LocationAPISearch = async (pokemon:string) => {
+    const retreive = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemon}`);
+    const retriveData = await retreive.json();
+
+    const promise = await fetch(`https://pokeapi.co/api/v2/pokemon/${retriveData.id}/encounters`);
+    const data = await promise.json();
+    return data;
+    
+}
+
+export {getPokemon, LocationAPISearch}
