@@ -1,7 +1,7 @@
 import React from 'react'
-import './styles/styles.css';
-import random from './assets/pokemonrandom.png';
-import search from './assets/pokemonsearch.png';
+import '../App.css';
+import random from '../assets/pokemonrandom.png';
+import search from '../assets/pokemonsearch.png';
 
 const NavBarComponent = () => {
   return (

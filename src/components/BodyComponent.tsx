@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getPokemon } from '../DataServices/DataServices'
-import './styles/styles.css';
+import '../App.css';
 
 const BodyComponent = () => {
 
@@ -18,7 +18,7 @@ const BodyComponent = () => {
 
   return (
         <div
-       className="bg-[url(./assets/pokemongrassbg.png)] min-h-screen bg-cover pt-[73px]"
+       className="fire min-h-screen bg-cover pt-[73px]"
     >
 
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-10 canvasBG">
