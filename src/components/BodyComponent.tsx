@@ -242,7 +242,9 @@ const BodyComponent = () => {
         <div className="mx-5">
             <input onChange={(e)=> setPokemonInput(e.target.value)} onKeyDown={(e: React.KeyboardEvent<HTMLInputElement> | React.ChangeEvent<HTMLInputElement>) => {if((e as React.KeyboardEvent<HTMLInputElement>).key === "Enter"){
                 setPokemonInput((e as React.ChangeEvent<HTMLInputElement>).target.value)
-                setSavedInput(pokemonInput)
+                if(pokemonInput !== ''){
+                    setSavedInput(pokemonInput);
+                }
                 reRenderPage();
             }
             }} value={pokemonInput} className="h-[50px] w-[275px] sm:h-[61px] sm:w-[379px] rounded-xl focus:outline-none focus:ring-0 text-xl sm:text-2xl placeholder:text-black juraRegular" type="text" placeholder="Search for a Pokemon"/>
@@ -250,7 +252,9 @@ const BodyComponent = () => {
         
 
         <button onClick={() => {
-            setSavedInput(pokemonInput);
+            if(pokemonInput !== ''){
+                setSavedInput(pokemonInput);
+            }
             reRenderPage();
         }} className="bg-[#F78484] w-[57px] h-[50px] sm:w-[70px] sm:h-[61px] flex items-center justify-center rounded-xl sm:rounded-2xl">
           <img src={search} alt="search icon" />
