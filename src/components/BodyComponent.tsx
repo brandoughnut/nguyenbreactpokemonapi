@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { LocationAPISearch, getEvolution, getPokemon, getPokemonName } from '../DataServices/DataServices'
 import favoriteIcon from '../assets/pokemonfavorite.png';
 import favoritedIcon from '../assets/pokemonfavoritefill.png';
+import remove from '../assets/pokemonremove.png';
 import random from '../assets/pokemonrandom.png';
 import search from '../assets/pokemonsearch.png';
 import '../App.css';
@@ -47,19 +48,21 @@ const BodyComponent = () => {
     const [pokemonEvolutionData, setPokemonEvolutionData] = useState<any>([]);
     const [pokemonInput, setPokemonInput] = useState<string>('1');
     const [savedInput, setSavedInput] = useState<string>('1');
+    const [localStorageItems, setLocalStorageItems] = useState<string>('1');
     const [toggleFavorite, setToggleFavorite] = useState<string>('hidden');
     const [favoriteToggle, setFavoriteToggle] = useState<string>('');
+    const [favoriteDisplay, setFavoriteDisplay] = useState<any>([]);
     const [pokemonBG, setPokemonBG] = useState<string>('grass');
 
     const [reRender, setReRender] = useState<boolean>(true);
     
     useEffect(() => {
-        console.log(savedInput);
         console.log(getLocalStorage());
         const getPokemonData = async () => {
             const pokemonData = await getPokemon(savedInput);
             const callName = await getPokemonName(savedInput);
             const pokemonLocation = await LocationAPISearch(savedInput);
+            setLocalStorageItems(`${pokemonData.id}`);
             setDataPokemon(pokemonData);
             setPokemonType(pokemonData.types);
             setPokemonName(callName.name[0].toUpperCase()+callName.name.substring(1));
@@ -167,10 +170,24 @@ const BodyComponent = () => {
             return pokemonEvolutionData;
 
         }
+
+        const pokemonFavorites = async() => {
+            let favorites = getLocalStorage();
+            let favArray:any = [];
+
+            for(let i = 0; i<favorites.length; i++){
+                const promise:any = await getPokemon(favorites[i]);
+                favArray.push(promise);
+            }
+            setFavoriteDisplay(favArray);
+            return favoriteDisplay;
+
+        }
         
         getPokemonData();
         pokemonTypeBG();
         pokemonEvolution();
+        pokemonFavorites();
         setPokemonInput('');
 
     }, [reRender])
@@ -199,9 +216,9 @@ const BodyComponent = () => {
 
     const handleFavorites = () => {
         if(!getLocalStorage().includes(`${dataPokemon.id}`)){
-            saveToLocalStorage(savedInput);
+            saveToLocalStorage(localStorageItems);
         }else{
-            removeFromLocalStorage(savedInput);
+            removeFromLocalStorage(localStorageItems);
         }
     }
 
@@ -411,7 +428,25 @@ const BodyComponent = () => {
             </svg>
             <span className="sr-only">Close menu</span>
         </button>
+        {favoriteDisplay.map((favorite:any, idx:number) => {
+        return(
+            <>
+                <div key={idx} className='rounded-2xl flex items-center justify-between text-[20px] mb-5 juraBold' style={{height: '58px', background: '#8E8E8E', paddingLeft: '10px', paddingRight: '10px', cursor: 'pointer'}}>
+                    {`${favorite.name[0].toUpperCase()}${favorite.name.substring(1)} #${favorite.id}`}
+                    <img onClick={()=> {
+                        handleFavorites();
+                        reRenderPage();
+                    }} src={remove} style={{cursor: 'pointer'}} alt='remove button'/>
+                </div>
+            </>
+        )
+    })
+    
+
+}
     </div>
+
+    
 
     </div>
   )
