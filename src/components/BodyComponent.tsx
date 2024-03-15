@@ -57,6 +57,7 @@ const BodyComponent = () => {
     const [reRender, setReRender] = useState<boolean>(true);
     
     useEffect(() => {
+        getLocalStorage();
         console.log(getLocalStorage());
         const getPokemonData = async () => {
             const pokemonData = await getPokemon(savedInput);
@@ -76,6 +77,7 @@ const BodyComponent = () => {
             }else{
                 setPokemonLocation(pokemonLocation[0].location_area.name.split("-").join(" "));
             }
+
             if(!getLocalStorage().includes(`${pokemonData.id}`)){
                 setFavoriteToggle(favoriteIcon);
             }else{
@@ -216,6 +218,7 @@ const BodyComponent = () => {
     }
 
     const handleFavorites = () => {
+        console.log(localStorageItems);
         if(!getLocalStorage().includes(`${dataPokemon.id}`)){
             saveToLocalStorage(localStorageItems);
         }else{
@@ -432,10 +435,13 @@ const BodyComponent = () => {
         {favoriteDisplay.map((favorite:any, idx:number) => {
         return(
             <>
-                <div key={idx} className='rounded-2xl flex items-center justify-between text-[20px] mb-5 juraBold' style={{height: '58px', background: '#8E8E8E', paddingLeft: '10px', paddingRight: '10px', cursor: 'pointer'}}>
+                <div key={idx} onClick={()=> {
+                    setSavedInput(favorite.id);
+                    reRenderPage();
+                }} className='rounded-2xl flex items-center justify-between text-[20px] mb-5 juraBold' style={{height: '58px', background: '#8E8E8E', paddingLeft: '10px', paddingRight: '10px', cursor: 'pointer'}}>
                     {`${favorite.name[0].toUpperCase()}${favorite.name.substring(1)} #${favorite.id}`}
                     <img onClick={()=> {
-                        setLocalStorageItems(favorite.id);
+                        setLocalStorageItems(`${favorite.id}`);
                         handleFavorites();
                         reRenderPage();
                     }} src={remove} style={{cursor: 'pointer'}} alt='remove button'/>
