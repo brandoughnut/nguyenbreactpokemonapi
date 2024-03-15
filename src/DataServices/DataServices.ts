@@ -13,7 +13,7 @@ const LocationAPISearch = async (pokemon:string) => {
     const retriveData = await retreive.json();
 
     const promise = await fetch(`https://pokeapi.co/api/v2/pokemon/${retriveData.id}/encounters`);
-    const data = await promise.json();
+    const data:any = await promise.json();
     return data;
     
 }
