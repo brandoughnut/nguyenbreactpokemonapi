@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { LocationAPISearch, getPokemon } from '../DataServices/DataServices'
+import { LocationAPISearch, getEvolution, getPokemon, getPokemonName } from '../DataServices/DataServices'
 import favoriteIcon from '../assets/pokemonfavorite.png';
 import random from '../assets/pokemonrandom.png';
 import search from '../assets/pokemonsearch.png';
@@ -42,20 +42,21 @@ const BodyComponent = () => {
     const [pokemonLocation, setPokemonLocation] = useState<string>('');
     const [pokemonMoves, setPokemonMoves] = useState<IPokemonMove[]>([]);
     const [pokemonAbilities, setPokemonAbilities] = useState<IPokemonAbilities[]>([]);
+    const [pokemonEvolutionData, setPokemonEvolutionData] = useState<any>([]);
     const [pokemonInput, setPokemonInput] = useState<string>('1');
     const [savedInput, setSavedInput] = useState<string>('1');
     const [toggleFavorite, setToggleFavorite] = useState<string>('hidden');
     const [pokemonBG, setPokemonBG] = useState<string>('grass');
 
     const [reRender, setReRender] = useState<boolean>(true);
-
+    
     useEffect(() => {
         const getPokemonData = async () => {
             const pokemonData = await getPokemon(savedInput);
+            const callName = await getPokemonName(savedInput);
             const pokemonLocation = await LocationAPISearch(savedInput);
-            console.log(pokemonData);
             setPokemonType(pokemonData.types);
-            setPokemonName(pokemonData.name[0].toUpperCase()+pokemonData.name.substring(1));
+            setPokemonName(callName.name[0].toUpperCase()+callName.name.substring(1));
             setPokemonID(pokemonData.id);
             setPokemonImage(pokemonData.sprites.other["official-artwork"].front_default);
             setPokemonMoves(pokemonData.moves);
@@ -125,11 +126,41 @@ const BodyComponent = () => {
                     setPokemonBG('grass');
             }
         }
+
+        const pokemonEvolution = async () => {
+            setPokemonEvolutionData([]);
+            let pokeEvolution:any = [];
+            let pokeEvolutionName:any = [];
+            const data2 = await getEvolution(savedInput);
+            let evolutionPush = data2.chain.species.url;
+            let evolutionPush2 = evolutionPush.substring(42, 50);
+
+            pokeEvolution.push(evolutionPush2.slice(0, -1));
+            pokeEvolutionName.push(data2.chain.species.name);
+            if(data2.chain.evolves_to !== null){
+                data2.chain.evolves_to.map((evolution:any) => {
+                    pokeEvolution.push(evolution.species.url.substring(42, 50).slice(0, -1));
+                    pokeEvolutionName.push(evolution.species.name);
+                });
+                if(data2.chain.evolves_to.length !== 0 && data2.chain.evolves_to.length !== 0){
+                    data2.chain.evolves_to[0].evolves_to.map((evolution:any) => {
+                        pokeEvolution.push(evolution.species.url.substring(42, 50).slice(0, -1));
+                        pokeEvolutionName.push(evolution.species.name);
+                    });
+                }
+            }
+
+            for(let i = 0; i<pokeEvolution.length; i++){
+                const promise:any = await getPokemon(pokeEvolution[i]);
+                setPokemonEvolutionData((prevItems:any)=> [...prevItems, promise]);
+            }
+
+        }
         
         getPokemonData();
         pokemonTypeBG();
+        pokemonEvolution();
         setPokemonInput('');
-        console.log(savedInput);
 
     }, [reRender])
 
@@ -163,7 +194,6 @@ const BodyComponent = () => {
     <div>
         <div className="flex justify-center xl:justify-between h-[97px] canvasBG">
       <div className="text-[60px] hidden xl:block judsonBold">Pokedex</div>
-
       <div className="flex items-center">
         <div className="hidden sm:block">
             <button onClick={() => {
@@ -223,7 +253,7 @@ const BodyComponent = () => {
 
             <div className="text-center text-[30px] mt-14 mx-7 juraBold">
                 <p>Name: {`${pokemonName} #${pokemonID}`}</p>
-                <p>Type: {pokemonType.map((type, idx:number) => {
+                <p>Type: {pokemonType.map((type:IPokemonType, idx:number) => {
                     return (
                         <>
                            {<span key={idx}>{`${type.type.name[0].toUpperCase()+type.type.name.substring(1)}`}
@@ -246,7 +276,7 @@ const BodyComponent = () => {
                 <div className="mt-8 marginPosition">
                     <p className="text-[30px] juraBold">Abilities</p>
                     <div className="overflow-y-scroll h-44">
-                        <p className="text-[25px] juraRegular">{pokemonAbilities.map((ability, idx:number) => {
+                        <p className="text-[25px] juraRegular">{pokemonAbilities.map((ability:IPokemonAbilities, idx:number) => {
                             return(
                                 <>
                                 {<span key={idx}>{`${ability.ability.name}`}
@@ -263,7 +293,7 @@ const BodyComponent = () => {
                     <p className="text-[30px] juraBold">Moves</p>
                     <div className="overflow-y-scroll h-44">
                         <p className="text-[25px] juraRegular">
-                            {pokemonMoves.map((move, idx:number) => {
+                            {pokemonMoves.map((move:IPokemonMove, idx:number) => {
                                 return (
                                     <>
                                     {<span key={idx}>{`${move.move.name}`}
@@ -281,7 +311,23 @@ const BodyComponent = () => {
     <div className="bg-white/75 h-auto rounded-3xl mt-10 canvasBG">
         <p className="text-[35px] xl:text-[40px] evolutionText">Evolutions</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 mt-8 justify-between">
-            
+            {pokemonEvolutionData.map((pokemon:any, idx:number)=> {
+                return(
+                    <>
+                        <div key={idx} className='grid justify-center mb-20'>
+                            <div onClick={()=> {
+                                setSavedInput(pokemon.id);
+                                reRenderPage();
+                            }} className='bg-white/75 rounded-[200px] px-5 py-5 joe'>
+                                <img src={pokemon.sprites.other["official-artwork"].front_default} style={{height: '200px', width: '200px', cursor: 'pointer'}} alt='pokemon evolutions'/>
+                            </div>
+                            <div className='text-center text-[30px] mt-4 juraBold'>
+                                {`${pokemon.name[0].toUpperCase()}${pokemon.name.substring(1)} #${pokemon.id}`}
+                            </div>
+                        </div>
+                    </>
+                )
+            })}
         </div>
     </div>
 
@@ -301,7 +347,7 @@ const BodyComponent = () => {
         <p className="text-[30px] mb-7 juraBold">Favorites</p>
         <button onClick={handleFavorites} type="button" data-drawer-hide="drawer-example" aria-controls="drawer-example" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-6 end-2.5 flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
             <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
             </svg>
             <span className="sr-only">Close menu</span>
         </button>
