@@ -128,7 +128,7 @@ const BodyComponent = () => {
         }
 
         const pokemonEvolution = async () => {
-            setPokemonEvolutionData([]);
+            let evoArray:any = [];
             let pokeEvolution:any = [];
             let pokeEvolutionName:any = [];
             const data2 = await getEvolution(savedInput);
@@ -152,8 +152,10 @@ const BodyComponent = () => {
 
             for(let i = 0; i<pokeEvolution.length; i++){
                 const promise:any = await getPokemon(pokeEvolution[i]);
-                setPokemonEvolutionData((prevItems:any)=> [...prevItems, promise]);
+                evoArray.push(promise);
             }
+            setPokemonEvolutionData(evoArray);
+            return pokemonEvolutionData;
 
         }
         
@@ -178,7 +180,7 @@ const BodyComponent = () => {
         setSavedInput(`${random}`);
     }
 
-    const handleFavorites = () => {
+    const openFavorites = () => {
         if(toggleFavorite === 'hidden'){
             setToggleFavorite('');
         }else {
@@ -188,6 +190,38 @@ const BodyComponent = () => {
 
     const reRenderPage = () => {
         setReRender(!reRender);
+    }
+
+    const saveToLocalStorage = (pokemon:string) => {
+        let favorites = getLocalStorage();
+    
+        if(!favorites.includes(pokemon)){
+            favorites.push(pokemon);
+        }
+    
+        localStorage.setItem("Favorite Pokemon", JSON.stringify(favorites));
+    }
+    
+    const getLocalStorage = () => {
+        let localStorageData = localStorage.getItem("Favorite Pokemon");
+    
+        if(localStorageData == null){
+            return [];
+        }
+    
+        return JSON.parse(localStorageData);
+    
+    }
+    
+    const removeFromLocalStorage = (pokemon:string) => {
+        let favorites = getLocalStorage();
+    
+        let namedIndex = favorites.indexOf(pokemon);
+    
+        favorites.splice(namedIndex, 1);
+    
+        localStorage.setItem("Favorite Pokemon", JSON.stringify(favorites));
+    
     }
 
   return (
@@ -265,7 +299,7 @@ const BodyComponent = () => {
                 
                 <p>Location Found: {pokemonLocation}</p>
                 <div className="text-center">
-                    <button onClick={handleFavorites} className="text-black bg-white opacity-75 h-[83px] w-[300px] sm:w-[398px] text-[30px] rounded-3xl px-5 py-2.5 mt-[37px] mb-[35px] xl:hidden juraBold" type="button" data-drawer-target="drawer-example" data-drawer-show="drawer-example" aria-controls="drawer-example">
+                    <button onClick={openFavorites} className="text-black bg-white opacity-75 h-[83px] w-[300px] sm:w-[398px] text-[30px] rounded-3xl px-5 py-2.5 mt-[37px] mb-[35px] xl:hidden juraBold" type="button" data-drawer-target="drawer-example" data-drawer-show="drawer-example" aria-controls="drawer-example">
                     Open Favorites
                     </button>
                  </div>
@@ -334,7 +368,7 @@ const BodyComponent = () => {
 
     <div className="hidden xl:block">
         <div className="text-center">
-            <button onClick={handleFavorites} className="text-black bg-white opacity-75 h-[83px] w-[398px] text-[30px] rounded-3xl px-5 py-2.5 mb-[113px] mt-[70px] juraBold" type="button" data-drawer-target="drawer-example" data-drawer-show="drawer-example" aria-controls="drawer-example">
+            <button onClick={openFavorites} className="text-black bg-white opacity-75 h-[83px] w-[398px] text-[30px] rounded-3xl px-5 py-2.5 mb-[113px] mt-[70px] juraBold" type="button" data-drawer-target="drawer-example" data-drawer-show="drawer-example" aria-controls="drawer-example">
                 Open Favorites
             </button>
         </div>
@@ -345,7 +379,7 @@ const BodyComponent = () => {
 
     <div className={`${toggleFavorite} transition-transform fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto bg-white w-80 dark:bg-gray-800`}>
         <p className="text-[30px] mb-7 juraBold">Favorites</p>
-        <button onClick={handleFavorites} type="button" data-drawer-hide="drawer-example" aria-controls="drawer-example" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-6 end-2.5 flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
+        <button onClick={openFavorites} type="button" data-drawer-hide="drawer-example" aria-controls="drawer-example" className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-6 end-2.5 flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white" >
             <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
             </svg>
