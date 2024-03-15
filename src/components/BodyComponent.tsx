@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { LocationAPISearch, getEvolution, getPokemon, getPokemonName } from '../DataServices/DataServices'
 import favoriteIcon from '../assets/pokemonfavorite.png';
+import favoritedIcon from '../assets/pokemonfavoritefill.png';
 import random from '../assets/pokemonrandom.png';
 import search from '../assets/pokemonsearch.png';
 import '../App.css';
@@ -35,6 +36,7 @@ const BodyComponent = () => {
         url:string
     }
 
+    const [dataPokemon, setDataPokemon] = useState<any>([]);
     const [pokemonName, setPokemonName] = useState<string>('');
     const [pokemonID, setPokemonID] = useState<string>('');
     const [pokemonType, setPokemonType] = useState<IPokemonType[]>([]);
@@ -46,15 +48,19 @@ const BodyComponent = () => {
     const [pokemonInput, setPokemonInput] = useState<string>('1');
     const [savedInput, setSavedInput] = useState<string>('1');
     const [toggleFavorite, setToggleFavorite] = useState<string>('hidden');
+    const [favoriteToggle, setFavoriteToggle] = useState<string>('');
     const [pokemonBG, setPokemonBG] = useState<string>('grass');
 
     const [reRender, setReRender] = useState<boolean>(true);
     
     useEffect(() => {
+        console.log(savedInput);
+        console.log(getLocalStorage());
         const getPokemonData = async () => {
             const pokemonData = await getPokemon(savedInput);
             const callName = await getPokemonName(savedInput);
             const pokemonLocation = await LocationAPISearch(savedInput);
+            setDataPokemon(pokemonData);
             setPokemonType(pokemonData.types);
             setPokemonName(callName.name[0].toUpperCase()+callName.name.substring(1));
             setPokemonID(pokemonData.id);
@@ -65,6 +71,11 @@ const BodyComponent = () => {
                 setPokemonLocation('N/A');
             }else{
                 setPokemonLocation(pokemonLocation[0].location_area.name.split("-").join(" "));
+            }
+            if(!getLocalStorage().includes(`${pokemonData.id}`)){
+                setFavoriteToggle(favoriteIcon);
+            }else{
+                setFavoriteToggle(favoritedIcon);
             }
         }
 
@@ -130,22 +141,20 @@ const BodyComponent = () => {
         const pokemonEvolution = async () => {
             let evoArray:any = [];
             let pokeEvolution:any = [];
-            let pokeEvolutionName:any = [];
             const data2 = await getEvolution(savedInput);
             let evolutionPush = data2.chain.species.url;
             let evolutionPush2 = evolutionPush.substring(42, 50);
 
             pokeEvolution.push(evolutionPush2.slice(0, -1));
-            pokeEvolutionName.push(data2.chain.species.name);
             if(data2.chain.evolves_to !== null){
                 data2.chain.evolves_to.map((evolution:any) => {
                     pokeEvolution.push(evolution.species.url.substring(42, 50).slice(0, -1));
-                    pokeEvolutionName.push(evolution.species.name);
+                    return pokeEvolution;
                 });
                 if(data2.chain.evolves_to.length !== 0 && data2.chain.evolves_to.length !== 0){
                     data2.chain.evolves_to[0].evolves_to.map((evolution:any) => {
                         pokeEvolution.push(evolution.species.url.substring(42, 50).slice(0, -1));
-                        pokeEvolutionName.push(evolution.species.name);
+                        return pokeEvolution;
                     });
                 }
             }
@@ -188,6 +197,14 @@ const BodyComponent = () => {
         }
     }
 
+    const handleFavorites = () => {
+        if(!getLocalStorage().includes(`${dataPokemon.id}`)){
+            saveToLocalStorage(savedInput);
+        }else{
+            removeFromLocalStorage(savedInput);
+        }
+    }
+
     const reRenderPage = () => {
         setReRender(!reRender);
     }
@@ -223,6 +240,8 @@ const BodyComponent = () => {
         localStorage.setItem("Favorite Pokemon", JSON.stringify(favorites));
     
     }
+
+
 
   return (
     <div>
@@ -283,14 +302,17 @@ const BodyComponent = () => {
                     <img className="h-[235px] cursorEffect" src={pokemonImage} alt="charmander"/>
                 </div>
                 <div>
-                    <img className='cursorEffect' src={favoriteIcon} alt="favorite icon"/>
+                    <img onClick={()=> {
+                        handleFavorites();
+                        reRenderPage();
+                        }} className='cursorEffect' src={favoriteToggle} alt="favorite icon"/>
                 </div>
                 
                 
             </div>
 
             <div className="text-center text-[30px] mt-14 mx-7 juraBold">
-                <p>Name: {`${pokemonName} #${pokemonID}`}</p>
+                <p key={'joe'}>Name: {`${pokemonName} #${pokemonID}`}</p>
                 <p>Type: {pokemonType.map((type:IPokemonType, idx:number) => {
                     return (
                         <>
@@ -356,7 +378,7 @@ const BodyComponent = () => {
                             <div onClick={()=> {
                                 setSavedInput(pokemon.id);
                                 reRenderPage();
-                            }} className='bg-white/75 rounded-[200px] px-5 py-5 joe'>
+                            }} className='bg-white/75 rounded-[200px] px-5 py-5 joe grid justify-center'>
                                 <img src={pokemon.sprites.other["official-artwork"].front_default} style={{height: '200px', width: '200px', cursor: 'pointer'}} alt='pokemon evolutions'/>
                             </div>
                             <div className='text-center text-[30px] mt-4 juraBold'>
