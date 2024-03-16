@@ -1,3 +1,6 @@
+Peer Reviewer - Jared Ly
+Peer Review - Everything seems to work perfectly and looks very clean, the only thing you could change is the moves and abilities being uppercased but not nessecary either way impressive job.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
