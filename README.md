@@ -1,3 +1,7 @@
+Name: Brandon Nguyen
+Date: 3/16/2024
+Lab Name: Pokemon API React Rebuild
+Brief Description: Build a pokemon application using react typescript that allows user to search, random, and favorite pokemon.
 Peer Reviewer - Jared Ly
 Peer Review - Everything seems to work perfectly and looks very clean, the only thing you could change is the moves and abilities being uppercased but not nessecary either way impressive job.
 

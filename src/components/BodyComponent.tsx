@@ -6,36 +6,9 @@ import remove from '../assets/pokemonremove.png';
 import random from '../assets/pokemonrandom.png';
 import search from '../assets/pokemonsearch.png';
 import '../App.css';
+import { IPokemonAbilities, IPokemonMove, IPokemonType } from '../Interfaces/Interface';
 
 const BodyComponent = () => {
-    interface IPokemonType {
-        slot:number
-        type:IType
-    }
-    
-    interface IType {
-        name:string
-        url:string
-    }
-
-    interface IPokemonMove {
-        move:IMove
-        version_group_details:[]
-    }
-
-    interface IMove {
-        name:string
-        url:string
-    }
-
-    interface IPokemonAbilities {
-        ability:IAbilities
-    }
-
-    interface IAbilities {
-        name:string
-        url:string
-    }
 
     const [dataPokemon, setDataPokemon] = useState<any>([]);
     const [pokemonName, setPokemonName] = useState<string>('');
@@ -49,7 +22,6 @@ const BodyComponent = () => {
     const [pokemonInput, setPokemonInput] = useState<string>('1');
     const [savedInput, setSavedInput] = useState<string>('1');
     const [localStorageItems, setLocalStorageItems] = useState<string>('1');
-    const [test, setTest] = useState<string>('1');
     const [toggleFavorite, setToggleFavorite] = useState<string>('hidden');
     const [favoriteToggle, setFavoriteToggle] = useState<string>('');
     const [favoriteDisplay, setFavoriteDisplay] = useState<any>([]);
@@ -59,14 +31,12 @@ const BodyComponent = () => {
     
     useEffect(() => {
         getLocalStorage();
-        console.log(getLocalStorage());
         const getPokemonData = async () => {
             const pokemonData = await getPokemon(savedInput);
+            console.log(pokemonData);
             const callName = await getPokemonName(savedInput);
             const pokemonLocation = await LocationAPISearch(savedInput);
-            await setLocalStorageItems(`${pokemonData.id}`);
-            console.log(localStorageItems);
-            console.log(test);
+            setLocalStorageItems(`${pokemonData.id}`);
             setDataPokemon(pokemonData);
             setPokemonType(pokemonData.types);
             setPokemonName(callName.name[0].toUpperCase()+callName.name.substring(1));
@@ -148,7 +118,7 @@ const BodyComponent = () => {
 
         const pokemonEvolution = async () => {
             let evoArray:any = [];
-            let pokeEvolution:any = [];
+            let pokeEvolution:string[] = [];
             const data2 = await getEvolution(savedInput);
             let evolutionPush = data2.chain.species.url;
             let evolutionPush2 = evolutionPush.substring(42, 50);
@@ -177,7 +147,7 @@ const BodyComponent = () => {
         }
 
         const pokemonFavorites = async() => {
-            let favorites = getLocalStorage();
+            let favorites:string[] = getLocalStorage();
             let favArray:any = [];
 
             for(let i = 0; i<favorites.length; i++){
@@ -220,7 +190,6 @@ const BodyComponent = () => {
     }
 
     const handleFavorites = () => {
-        console.log(localStorageItems);
         if(!getLocalStorage().includes(`${dataPokemon.id}`)){
             saveToLocalStorage(localStorageItems);
         }else{
@@ -233,7 +202,7 @@ const BodyComponent = () => {
     }
 
     const saveToLocalStorage = (pokemon:string) => {
-        let favorites = getLocalStorage();
+        let favorites:string[] = getLocalStorage();
     
         if(!favorites.includes(pokemon)){
             favorites.push(pokemon);
@@ -254,9 +223,9 @@ const BodyComponent = () => {
     }
     
     const removeFromLocalStorage = (pokemon:string) => {
-        let favorites = getLocalStorage();
+        let favorites:string[] = getLocalStorage();
     
-        let namedIndex = favorites.indexOf(pokemon);
+        let namedIndex:number = favorites.indexOf(pokemon);
     
         favorites.splice(namedIndex, 1);
     
@@ -443,9 +412,7 @@ const BodyComponent = () => {
                 }} className='rounded-2xl flex items-center justify-between text-[20px] mb-5 juraBold' style={{height: '58px', background: '#8E8E8E', paddingLeft: '10px', paddingRight: '10px', cursor: 'pointer'}}>
                     {`${favorite.name[0].toUpperCase()}${favorite.name.substring(1)} #${favorite.id}`}
                     <img onClick={()=> {
-                        // setTest(`${favorite.id}`);
-                        removeFromLocalStorage(`${favorite.id}}`);
-                        console.log(favorite.id);
+                        removeFromLocalStorage(`${favorite.id}`);
                         reRenderPage();
                     }} src={remove} style={{cursor: 'pointer'}} alt='remove button'/>
                 </div>
