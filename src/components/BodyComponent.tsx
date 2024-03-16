@@ -64,7 +64,7 @@ const BodyComponent = () => {
             const pokemonData = await getPokemon(savedInput);
             const callName = await getPokemonName(savedInput);
             const pokemonLocation = await LocationAPISearch(savedInput);
-            setLocalStorageItems(`${pokemonData.id}`);
+            await setLocalStorageItems(`${pokemonData.id}`);
             console.log(localStorageItems);
             console.log(test);
             setDataPokemon(pokemonData);
@@ -198,7 +198,7 @@ const BodyComponent = () => {
     }, [reRender])
 
     const shinyPokemon = async() => {
-        const pokemonData = await getPokemon(savedInput);
+        const pokemonData:any = await getPokemon(savedInput);
         if(pokemonImage === pokemonData.sprites.other["official-artwork"].front_default){
             setPokemonImage(pokemonData.sprites.other["official-artwork"].front_shiny);
         }else{
@@ -226,10 +226,6 @@ const BodyComponent = () => {
         }else{
             removeFromLocalStorage(localStorageItems);
         }
-    }
-
-    const removeFavorites = async() => {
-        console.log(await test);
     }
 
     const reRenderPage = () => {
@@ -447,9 +443,9 @@ const BodyComponent = () => {
                 }} className='rounded-2xl flex items-center justify-between text-[20px] mb-5 juraBold' style={{height: '58px', background: '#8E8E8E', paddingLeft: '10px', paddingRight: '10px', cursor: 'pointer'}}>
                     {`${favorite.name[0].toUpperCase()}${favorite.name.substring(1)} #${favorite.id}`}
                     <img onClick={()=> {
-                        setTest(`${favorite.id}`);
-                        removeFromLocalStorage(test);
-                        removeFavorites();
+                        // setTest(`${favorite.id}`);
+                        removeFromLocalStorage(`${favorite.id}}`);
+                        console.log(favorite.id);
                         reRenderPage();
                     }} src={remove} style={{cursor: 'pointer'}} alt='remove button'/>
                 </div>
