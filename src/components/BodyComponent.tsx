@@ -49,6 +49,7 @@ const BodyComponent = () => {
     const [pokemonInput, setPokemonInput] = useState<string>('1');
     const [savedInput, setSavedInput] = useState<string>('1');
     const [localStorageItems, setLocalStorageItems] = useState<string>('1');
+    const [test, setTest] = useState<string>('1');
     const [toggleFavorite, setToggleFavorite] = useState<string>('hidden');
     const [favoriteToggle, setFavoriteToggle] = useState<string>('');
     const [favoriteDisplay, setFavoriteDisplay] = useState<any>([]);
@@ -65,6 +66,7 @@ const BodyComponent = () => {
             const pokemonLocation = await LocationAPISearch(savedInput);
             setLocalStorageItems(`${pokemonData.id}`);
             console.log(localStorageItems);
+            console.log(test);
             setDataPokemon(pokemonData);
             setPokemonType(pokemonData.types);
             setPokemonName(callName.name[0].toUpperCase()+callName.name.substring(1));
@@ -224,6 +226,10 @@ const BodyComponent = () => {
         }else{
             removeFromLocalStorage(localStorageItems);
         }
+    }
+
+    const removeFavorites = async() => {
+        console.log(await test);
     }
 
     const reRenderPage = () => {
@@ -441,8 +447,9 @@ const BodyComponent = () => {
                 }} className='rounded-2xl flex items-center justify-between text-[20px] mb-5 juraBold' style={{height: '58px', background: '#8E8E8E', paddingLeft: '10px', paddingRight: '10px', cursor: 'pointer'}}>
                     {`${favorite.name[0].toUpperCase()}${favorite.name.substring(1)} #${favorite.id}`}
                     <img onClick={()=> {
-                        setLocalStorageItems(`${favorite.id}`);
-                        handleFavorites();
+                        setTest(`${favorite.id}`);
+                        removeFromLocalStorage(test);
+                        removeFavorites();
                         reRenderPage();
                     }} src={remove} style={{cursor: 'pointer'}} alt='remove button'/>
                 </div>
