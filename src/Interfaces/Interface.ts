@@ -50,10 +50,28 @@ export interface IPokemon {
         }
     }
 }
-
 export interface ILocation {
     location_area:{
         name:string
         url:string
     }
+}
+
+export interface IEvolution {
+    chain:Chain;
+}
+
+export interface Chain {
+    evolves_to:Evolution[];
+    species:Species;
+}
+
+export interface Evolution{
+    evolves_to:Evolution[]
+    species:Species
+}
+
+interface Species {
+    name:string
+    url:string
 }

@@ -6,7 +6,7 @@ import remove from '../assets/pokemonremove.png';
 import random from '../assets/pokemonrandom.png';
 import search from '../assets/pokemonsearch.png';
 import '../App.css';
-import { ILocation, IPokemon, IPokemonAbilities, IPokemonMove, IPokemonSpecies, IPokemonType } from '../Interfaces/Interface';
+import { Chain, IEvolution, ILocation, IPokemon, IPokemonAbilities, IPokemonMove, IPokemonSpecies, IPokemonType } from '../Interfaces/Interface';
 
 const BodyComponent = () => {
 
@@ -18,7 +18,7 @@ const BodyComponent = () => {
     const [pokemonLocation, setPokemonLocation] = useState<string>('');
     const [pokemonMoves, setPokemonMoves] = useState<IPokemonMove[]>([]);
     const [pokemonAbilities, setPokemonAbilities] = useState<IPokemonAbilities[]>([]);
-    const [pokemonEvolutionData, setPokemonEvolutionData] = useState<any>([]);
+    const [pokemonEvolutionData, setPokemonEvolutionData] = useState<IPokemon[]>([]);
     const [pokemonInput, setPokemonInput] = useState<string>('1');
     const [savedInput, setSavedInput] = useState<string>('1');
     const [localStorageItems, setLocalStorageItems] = useState<string>('1');
@@ -116,20 +116,20 @@ const BodyComponent = () => {
         }
 
         const pokemonEvolution = async () => {
-            let evoArray:any = [];
+            let evoArray:IPokemon[] = [];
             let pokeEvolution:string[] = [];
-            const data2 = await getEvolution(savedInput);
+            const data2:IEvolution = await getEvolution(savedInput);
             let evolutionPush:string = data2.chain.species.url;
             let evolutionPush2 = evolutionPush.substring(42, 50);
 
             pokeEvolution.push(evolutionPush2.slice(0, -1));
             if(data2.chain.evolves_to !== null){
-                data2.chain.evolves_to.map((evolution:any) => {
+                data2.chain.evolves_to.map((evolution:Chain) => {
                     pokeEvolution.push(evolution.species.url.substring(42, 50).slice(0, -1));
                     return pokeEvolution;
                 });
                 if(data2.chain.evolves_to.length !== 0 && data2.chain.evolves_to.length !== 0){
-                    data2.chain.evolves_to[0].evolves_to.map((evolution:any) => {
+                    data2.chain.evolves_to[0].evolves_to.map((evolution:Chain) => {
                         pokeEvolution.push(evolution.species.url.substring(42, 50).slice(0, -1));
                         return pokeEvolution;
                     });
@@ -362,7 +362,7 @@ const BodyComponent = () => {
     <div className="bg-white/75 h-auto rounded-3xl mt-10 canvasBG">
         <p className="text-[35px] xl:text-[40px] evolutionText">Evolutions</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 mt-8 justify-between">
-            {pokemonEvolutionData.map((pokemon:any, idx:number)=> {
+            {pokemonEvolutionData.map((pokemon:IPokemon, idx:number)=> {
                 return(
                     <>
                         <div key={idx} className='grid justify-center mb-20'>

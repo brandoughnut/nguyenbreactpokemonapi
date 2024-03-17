@@ -1,4 +1,4 @@
-import { ILocation, IPokemon, IPokemonSpecies } from "../Interfaces/Interface";
+import { IEvolution, ILocation, IPokemon, IPokemonSpecies } from "../Interfaces/Interface";
 
 const getPokemon = async (pokemon:string) => {
     const retrieve = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemon}`);
@@ -30,7 +30,7 @@ const getEvolution = async (pokemon:string) => {
     const data:IPokemonSpecies = await promise.json();
 
     const promise2 = await fetch(data.evolution_chain.url);
-    const data2:any = await promise2.json();
+    const data2:IEvolution = await promise2.json();
 
     return data2;
 }
